@@ -8,6 +8,7 @@ import com.mygdx.game.MyGame;
 
 
 public class Player  {
+    public TypesOfPlayers name;
 
     private Texture playerTexture;
     private Rectangle playerRect;
@@ -24,7 +25,22 @@ public class Player  {
     private int mana = manaPool;
     private String statusOfPlayer = "Is alive";
 
+    public Texture manaBottleNull;
+    public Texture manaBottle;
+
     public Player(int playerNumber, float x, float y){
+        switch (playerNumber){
+            case 2 :
+                name = TypesOfPlayers.PHOENIX;
+                manaBottleNull = new Texture("manaFolder/bottleNoManaPhoenix.png");
+                manaBottle = new Texture("manaFolder/bottleWithManaPhoenix.png");
+                break;
+            case 1 :
+                name = TypesOfPlayers.TIGER;
+                manaBottleNull = new Texture("manaFolder/bottleNoManaTiger.png");
+                manaBottle = new Texture("manaFolder/bottleWithManaTiger.png");
+                break;
+        }
         healthPoints = 300;
         playerPos = new Vector3(x * MyGame.ratioDeviceScreenToGameWight, y * MyGame.ratioDeviceScreenToGameHeight, 0);
         playerTexture = new Texture("players/player.png");

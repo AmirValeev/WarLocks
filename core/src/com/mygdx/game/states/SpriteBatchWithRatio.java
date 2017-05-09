@@ -12,8 +12,8 @@ public class SpriteBatchWithRatio extends SpriteBatch {
     @Override
     public void draw(Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
         super.draw(texture, x, y, originX * MyGame.ratioDeviceScreenToGameWight, originY * MyGame.ratioDeviceScreenToGameHeight,
-                width, height, scaleX * MyGame.ratioDeviceScreenToGameWight, scaleY * MyGame.ratioDeviceScreenToGameHeight,
-                rotation, srcX, srcY, (int) (srcWidth * MyGame.ratioDeviceScreenToGameWight), (int) (srcHeight * MyGame.ratioDeviceScreenToGameHeight), flipX, flipY);
+                width * MyGame.ratioDeviceScreenToGameWight, height * MyGame.ratioDeviceScreenToGameHeight, scaleX , scaleY,
+                rotation, srcX, srcY,srcWidth, srcHeight, flipX, flipY);
     }
 
     @Override
