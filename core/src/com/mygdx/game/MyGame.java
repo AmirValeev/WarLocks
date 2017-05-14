@@ -3,7 +3,6 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.game.states.GameStateManager;
 import com.mygdx.game.states.MenuState;
@@ -26,7 +25,6 @@ public class MyGame extends ApplicationAdapter {
 
 		ratioDeviceScreenToGameHeight =  Gdx.graphics.getHeight() / MyGame.HEIGHT;
 		ratioDeviceScreenToGameWight = (Gdx.graphics.getWidth() / MyGame.WIGHT);
-
 		batch = new SpriteBatchWithRatio();
 		shapeRenderer = new ShapeRenderer();
 		gsm = new GameStateManager();
@@ -40,4 +38,9 @@ public class MyGame extends ApplicationAdapter {
 		gsm.update(Gdx.graphics.getDeltaTime());
 		gsm.render(batch, shapeRenderer);
 	}
+	public void dispose(){
+		batch.dispose();
+		shapeRenderer.dispose();
+	}
+
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
@@ -18,12 +19,12 @@ import com.mygdx.game.sprites.Card;
 import com.mygdx.game.sprites.HeroCard;
 import com.mygdx.game.sprites.Player;
 import com.mygdx.game.sprites.Positions;
+import com.mygdx.game.sprites.TypesOfPlayers;
 
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import sun.rmi.runtime.Log;
 
 
 class PlayState extends State {
@@ -49,8 +50,12 @@ class PlayState extends State {
     private Vector3 positionOfSkipBtn;
     private Rectangle fightZone;
     private boolean cardChoosed;
+
+    private Matrix4 defaultMatrix;
+
     private BitmapFont bitmapForTextOfFirst;
     private BitmapFont bitmapForTextOfSecond;
+    private BitmapFont verticalBitmap;
 
     private Texture healthPointBar;
 
@@ -61,9 +66,8 @@ class PlayState extends State {
     private float velocityOfTransparency = 0;
     private float transparency = 0;
 
-    Texture point = new Texture("point.png");
 
-     HeroCard TESTCARD;
+ //    HeroCard TESTCARD;
 
 
     PlayState(GameStateManager gsm) {
@@ -73,7 +77,7 @@ class PlayState extends State {
         backgroundRyab = new Texture("backgroundRyab.png");
 
         background = new Texture("background.png");
-        skipBtn = new Texture("skipBtn/skipBtn.png");
+        skipBtn = new Texture("skipBtn/skipBtnTiger.png");
         healthPointBar = new Texture("healthPointBar.png");
         positionOfSkipBtn = new Vector3((MyGame.WIGHT - skipBtn.getWidth()) * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 - skipBtn.getHeight() / 2) * MyGame.ratioDeviceScreenToGameHeight, 0);
 
@@ -81,11 +85,16 @@ class PlayState extends State {
         camera = new OrthographicCamera();
         camera.setToOrtho(true, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        defaultMatrix = new Matrix4();
 
-        bitmapForTextOfFirst = new BitmapFont(false);
+        bitmapForTextOfFirst = new BitmapFont(Gdx.files.internal("font/font.fnt"),false);
         bitmapForTextOfFirst.setColor(Color.WHITE);
-        bitmapForTextOfSecond = new BitmapFont(true);
+        bitmapForTextOfFirst.getData().setScale(0.7f * MyGame.ratioDeviceScreenToGameWight, 0.5f * MyGame.ratioDeviceScreenToGameHeight);
+        bitmapForTextOfSecond = new BitmapFont(Gdx.files.internal("font/font.fnt"),true);
         bitmapForTextOfSecond.setColor(Color.WHITE);
+        verticalBitmap = new BitmapFont(Gdx.files.internal("font/font.fnt"), false);
+        verticalBitmap.getData().setScale(0.7f * MyGame.ratioDeviceScreenToGameWight, 0.7f * MyGame.ratioDeviceScreenToGameHeight);
+        verticalBitmap.setColor(Color.WHITE);
 
         cards = new ArrayList<HeroCard>();
         positions = new Array<Positions>();
@@ -116,19 +125,19 @@ class PlayState extends State {
         timer = new Timer();
         timerForOneStroke = new TimerForOneStroke();
         timer.scheduleAtFixedRate(timerForOneStroke, 0, 1000);
-        cardXDistance1 = MyGame.WIGHT / 2 - (Card.CARD_WIGHT * 0.8f * 4 + 30 * 3) / 2;
-        cardXDistance2 = MyGame.WIGHT / 2 - (Card.CARD_WIGHT * 0.8f * 4 + 30 * 3) / 2;
+        cardXDistance1 = MyGame.WIGHT / 2 - (Card.CARD_WIGHT * 0.7f * 4 + 30 * 3) / 2;
+        cardXDistance2 = MyGame.WIGHT / 2 - (Card.CARD_WIGHT * 0.7f * 4 + 30 * 3) / 2;
         for (int i = 0; i < 4; i++) {
-            fightPositions.add(new Positions(new Vector3(cardXDistance1 * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 - Card.CARD_HEIGHT - 15) * 0.7f * MyGame.ratioDeviceScreenToGameHeight, 0), 1, 0));
-            fightPositions.add(new Positions(new Vector3(cardXDistance2 * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 + 30) * MyGame.ratioDeviceScreenToGameHeight * 0.8f, 0), 2, 0));
-            cardXDistance1 = cardXDistance1 + (15 + Card.CARD_WIGHT) * 0.8f;
-            cardXDistance2 = cardXDistance2 + (15 + Card.CARD_WIGHT) * 0.8f;
+            fightPositions.add(new Positions(new Vector3(cardXDistance1 * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 - Card.CARD_HEIGHT * 0.7f - 15)  * MyGame.ratioDeviceScreenToGameHeight, 0), 1, 0));
+            fightPositions.add(new Positions(new Vector3(cardXDistance2 * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 + 15) * MyGame.ratioDeviceScreenToGameHeight , 0), 2, 0));
+            cardXDistance1 = cardXDistance1 + (30 + Card.CARD_WIGHT) * 0.7f;
+            cardXDistance2 = cardXDistance2 + (30 + Card.CARD_WIGHT) * 0.7f;
         }
         for (Positions pos : fightPositions) {
             pos.setUsage(false);
         }
 
-           TESTCARD = new HeroCard(MyGame.WIGHT * MyGame.ratioDeviceScreenToGameWight / 2, MyGame.HEIGHT * MyGame.ratioDeviceScreenToGameHeight / 2, 2);
+         //  TESTCARD = new HeroCard(MyGame.WIGHT * MyGame.ratioDeviceScreenToGameWight / 2, MyGame.HEIGHT * MyGame.ratioDeviceScreenToGameHeight / 2, 2);
     }
 
 
@@ -141,7 +150,7 @@ class PlayState extends State {
 
     @Override
     public void update(float dt) {
-        TESTCARD.ANGLETEST++;
+   //     TESTCARD.ANGLETEST++;
 
         if (transparency < 100) {
             float accelerationOfTransparency = 6;
@@ -201,19 +210,30 @@ class PlayState extends State {
         shapeRenderer.setColor(Color.GREEN);
         sb.setProjectionMatrix(camera.combined);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sb.draw(background, 0, 0);
-      //  sb.draw(skipBtn, positionOfSkipBtn.x, positionOfSkipBtn.y);
-        // sb.draw(player2.getPlayerTexture(), player2.getPlayerPos().x, player2.getPlayerPos().y,player2.getPlayerTexture().getWidth(), player2.getPlayerTexture().getHeight(), 1, 1,
-        //        player2.getPlayerTexture().getWidth(), player2.getPlayerTexture().getHeight(), true, true );
-        //  sb.draw(player1.getPlayerTexture(), player1.getPlayerPos().x, player1.getPlayerPos().y);
+        sb.draw(skipBtn, positionOfSkipBtn.x, positionOfSkipBtn.y);
 
-        bitmapForTextOfSecond.draw(sb, "" + timerForOneStroke.getTime(), 0, 200);
+        defaultMatrix = sb.getTransformMatrix().cpy();
+        Matrix4 m4VerticalText = new Matrix4();
+        m4VerticalText.setToRotation(new Vector3(0, 0, 1), 270);
+
+        if (timerForOneStroke.getTime() < 10)
+            m4VerticalText.trn((MyGame.WIGHT - 65 * 0.7f) * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 + 20 * 0.7f) * MyGame.ratioDeviceScreenToGameHeight, 0);
+        else
+            m4VerticalText.trn((MyGame.WIGHT - 65 * 0.7f) * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 + 40 * 0.7f) * MyGame.ratioDeviceScreenToGameHeight, 0);
+
+
+        sb.setTransformMatrix(m4VerticalText);
+        verticalBitmap.draw(sb, "" + timerForOneStroke.getTime(), 0, 0 );
+
         bitmapForTextOfFirst.draw(sb, "" + player1.getMana(), MyGame.WIGHT - 20, Card.CARD_WIGHT);
         bitmapForTextOfSecond.draw(sb, "" + player2.getMana(), 18, MyGame.HEIGHT - Card.CARD_HEIGHT - 10);
-      /*  manaDrawer(sb, player1);
-        manaDrawer(sb, player2);*/
+        sb.setTransformMatrix(defaultMatrix);
+        manaDrawer(sb, player1);
+        manaDrawer(sb, player2);
 
-          cardDrawer(TESTCARD,sb, shapeRenderer, 0.7f, TESTCARD.ANGLETEST);
+    //      cardDrawer(TESTCARD,sb, shapeRenderer, 0.7f, TESTCARD.ANGLETEST);
 
 
         for (Positions pos : positions)
@@ -235,7 +255,7 @@ class PlayState extends State {
                 if (!card.onTouched && card.numberOfPlayer != cards.get(indexOfPickedCard).numberOfPlayer && card.isHaveActivated() && cards.get(indexOfPickedCard).isHaveActivated())
                     cardDrawer(card, sb, shapeRenderer, 0.8f, 0);
 
-            cardDrawer(cards.get(indexOfPickedCard), sb, shapeRenderer, 0.9f, 0);
+            cardDrawer(cards.get(indexOfPickedCard), sb, shapeRenderer, .9f, 0);
         }
 
         shapeRenderer.end();
@@ -368,13 +388,24 @@ class PlayState extends State {
     }*/
 
     private void skipStokeButtonChecker() {
-        if (Gdx.input.isTouched() && Gdx.input.getX() > positionOfSkipBtn.x && Gdx.input.getY() > positionOfSkipBtn.y && Gdx.input.getY() < positionOfSkipBtn.y + skipBtn.getHeight() * MyGame.ratioDeviceScreenToGameHeight && !cardChoosed)
-            skipBtn = new Texture("skipBtn/skipBtnPressed.png");
-        else skipBtn = new Texture("skipBtn/skipBtn.png");
+        if (Gdx.input.isTouched() && Gdx.input.getX() > positionOfSkipBtn.x && Gdx.input.getY() > positionOfSkipBtn.y && Gdx.input.getY() < positionOfSkipBtn.y + skipBtn.getHeight() * MyGame.ratioDeviceScreenToGameHeight && !cardChoosed){
+            if (whoHaveStroke == 1)
+            skipBtn = new Texture("skipBtn/skipBtnTigerPressed.png");
+            else
+                skipBtn = new Texture("skipBtn/skipBtnPhoenixPressed.png");}
+        else {
+            if (whoHaveStroke == 1)
+            skipBtn = new Texture("skipBtn/skipBtnTiger.png");
+            else
+                skipBtn = new Texture("skipBtn/skipBtnPhoenix.png");
+        }
 
         if (Gdx.input.justTouched() && Gdx.input.getX() > positionOfSkipBtn.x && Gdx.input.getY() > positionOfSkipBtn.y && Gdx.input.getY() < positionOfSkipBtn.y + skipBtn.getHeight() * MyGame.ratioDeviceScreenToGameHeight) {
             swapOfStoke();
-            skipBtn = new Texture("skipBtn/skipBtn.png");
+            if (whoHaveStroke == 1)
+            skipBtn = new Texture("skipBtn/skipBtnTiger.png");
+            else
+                skipBtn = new Texture("skipBtn/skipBtnPhoenix.png");
         }
     }
 
@@ -384,10 +415,10 @@ class PlayState extends State {
         if (whoHaveStroke == 2) {
             whoHaveStroke = 1;
             numberOfStoke++;
-            if (player1.getManaPool() < 12) {
+            if (player1.getManaPool() < 10) {
                 player1.setManaPool(player1.getManaPool() + 1);
             }
-            if (player2.getManaPool() < 12) {
+            if (player2.getManaPool() < 10) {
                 player2.setManaPool(player2.getManaPool() + 1);
             }
             player1.setMana(player1.getManaPool());
@@ -450,23 +481,24 @@ class PlayState extends State {
 
                 shapeRenderer.rect((card.getPosition().x + 4 * MyGame.ratioDeviceScreenToGameWight), card.getPosition().y - 10 * MyGame.ratioDeviceScreenToGameHeight, ((float) 106 / card.getHealthPool()) * card.getHealthPoints() * scope * MyGame.ratioDeviceScreenToGameWight, 8 * scope * MyGame.ratioDeviceScreenToGameHeight);
             }
+            if (!card.isHaveActivated())
+                sb.draw(card.getManaForUseTexture(), card.getPosition().x - (card.getCardTexture().getWidth() - card.getCardDefault().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight + card.getCardTexture().getWidth() - card.getManaForUseTexture().getWidth(), card.getPosition().y - (card.getCardTexture().getHeight() - card.getCharacterTexture().getHeight()) * MyGame.ratioDeviceScreenToGameHeight + (card.getCardTexture().getHeight() - card.getManaForUseTexture().getHeight()) * MyGame.ratioDeviceScreenToGameHeight ,
+                        (-card.getCardBackgroundTexture().getWidth()+ card.getManaForUseTexture().getWidth()) / 2, card.getManaForUseTexture().getHeight() - card.getCharacterTexture().getHeight(), card.getManaForUseTexture().getWidth(), card.getManaForUseTexture().getHeight(), 1 *scope, 1 * scope, angle, 0, 0, card.getManaForUseTexture().getWidth(), card.getManaForUseTexture().getHeight(), true, false);
 
             sb.draw(card.getCharacterTexture(), card.getPosition().x, card.getPosition().y, card.getCardDefault().getWidth() / 2, 0, card.getCharacterTexture().getWidth(), card.getCharacterTexture().getHeight(),
-                    1 * scope, 1 * scope, angle, 0, 0, card.getCharacterTexture().getWidth(), card.getCharacterTexture().getHeight(), false, false);
-
+                    1 * scope, 1 * scope, angle, 0, 0, card.getCharacterTexture().getWidth(), card.getCharacterTexture().getHeight(), false,false);
             if (card.onTouched || card.isHaveActivated()) {
                 sb.draw(card.getTypeOfHeroSkillTexture(), card.getPosition().x , card.getPosition().y + card.getCardDefault().getHeight() * MyGame.ratioDeviceScreenToGameHeight, 0, 0,
                         card.getTypeOfHeroSkillTexture().getWidth(), card.getTypeOfHeroSkillTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getTypeOfHeroSkillTexture().getWidth(), card.getTypeOfHeroSkillTexture().getHeight(), false, false);
-
-                bitmapForTextOfFirst.draw(sb, " hp " + card.getHealthPoints() + " dm " + card.getDamage() + " mn " + card.getManaForUse(), card.getPosition().x, card.getPosition().y + 12 * MyGame.ratioDeviceScreenToGameHeight);
             }
+
         } else {
             if (!card.isHaveActivated())
                 sb.draw(card.getCardTexture(), card.getPosition().x + (Card.CARD_WIGHT - card.getCardTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y,
-                        card.getCardTexture().getWidth() / 2 , card.getCardDefault().getHeight() , card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), true, true);
+                        card.getCardTexture().getWidth() / 2 , card.getCardDefault().getHeight() , card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), true, false);
 
-            sb.draw(card.getCardBackgroundTexture(), card.getPosition().x + (Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight , card.getPosition().y + (Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 * MyGame.ratioDeviceScreenToGameHeight * scope,
-                    card.getCardBackgroundTexture().getWidth() / 2 , ((card.getCardBackgroundTexture().getHeight() - card.getCardDefault().getHeight()) / 2 + card.getCardDefault().getHeight()), card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), false, false);
+            sb.draw(card.getCardBackgroundTexture(), card.getPosition().x + (Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight , card.getPosition().y + (Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 * MyGame.ratioDeviceScreenToGameHeight,
+                    card.getCardBackgroundTexture().getWidth() / 2 , (card.getCardBackgroundTexture().getHeight() - card.getCardDefault().getHeight()) / 2 + card.getCardDefault().getHeight(), card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), false, false);
 
             if (card.onTouched || card.isHaveActivated()) {
                 sb.draw(healthPointBar, card.getPosition().x, card.getPosition().y + Card.CARD_HEIGHT * MyGame.ratioDeviceScreenToGameHeight , healthPointBar.getWidth() / 2 , 0, healthPointBar.getWidth(), healthPointBar.getHeight(),
@@ -478,53 +510,40 @@ class PlayState extends State {
                     card.getCharacterTexture().getWidth(), card.getCharacterTexture().getHeight(), 1 * scope, 1 * scope, angle,
                     0, 0, card.getCharacterTexture().getWidth(), card.getCharacterTexture().getHeight(), true, true);
 
+            if (!card.isHaveActivated())
+                sb.draw(card.getManaForUseTexture(),card.getPosition().x + (Card.CARD_WIGHT - card.getCardTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y,
+                        card.getCardTexture().getWidth() / 2, card.getCardDefault().getHeight(), card.getManaForUseTexture().getWidth(), card.getManaForUseTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getManaForUseTexture().getWidth(), card.getManaForUseTexture().getHeight(), false, true);
+
             if (card.onTouched || card.isHaveActivated()) {
                 sb.draw(card.getTypeOfHeroSkillTexture(), card.getPosition().x, card.getPosition().y - card.getTypeOfHeroSkillTexture().getHeight() * MyGame.ratioDeviceScreenToGameHeight , 0, 0,
                         card.getTypeOfHeroSkillTexture().getWidth(), card.getTypeOfHeroSkillTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getTypeOfHeroSkillTexture().getWidth(), card.getTypeOfHeroSkillTexture().getHeight(), true, true);
 
-                bitmapForTextOfSecond.draw(sb, " hp " + card.getHealthPoints() + " dm " + card.getDamage() + " mn " + card.getManaForUse(), card.getPosition().x, card.getPosition().y + (Card.CARD_HEIGHT - 12) * MyGame.ratioDeviceScreenToGameHeight);
+             //   bitmapForTextOfSecond.draw(sb, " hp " + card.getHealthPoints() + " dm " + card.getDamage() + " mn " + card.getManaForUse(), card.getPosition().x, card.getPosition().y + (Card.CARD_HEIGHT - 12) * MyGame.ratioDeviceScreenToGameHeight);
             }
-            //   sb.draw(card.getCardDefault(),card.getPosition().x, card.getPosition().y,card.getCardDefault().getWidth() * scope, card.getCardDefault().getHeight() * scope);
 
         }
     }
 
-  /*  private void manaDrawer(SpriteBatchWithRatio sb, Player player){
-        float manaDistance = MyGame.WIGHT / 2;
+    private void manaDrawer(SpriteBatchWithRatio sb, Player player){
+        float manaDistanceX = (MyGame.WIGHT - player.manaBottle.getWidth() - 4) * MyGame.ratioDeviceScreenToGameWight;
+        float manaDistanceY;
+        if (player.name == TypesOfPlayers.TIGER)
+             manaDistanceY = 0;
+        else manaDistanceY = (MyGame.HEIGHT - player.manaBottle.getHeight()) * MyGame.ratioDeviceScreenToGameHeight;
+
+        for (int i = 0; i < player.getManaPool(); i++) {
+            sb.draw(player.manaBottleNull,manaDistanceX, manaDistanceY, player.manaBottleNull.getWidth() , player.manaBottleNull.getHeight());
+            manaDistanceX = manaDistanceX - player.manaBottle.getWidth() * MyGame.ratioDeviceScreenToGameWight;
+        }
+
+        manaDistanceX = (MyGame.WIGHT - player.manaBottle.getWidth() - 4) * MyGame.ratioDeviceScreenToGameWight;
+
         for (int i = 0; i < player.getMana(); i++) {
-            sb.draw(player.manaBottle, manaDistance, MyGame.HEIGHT / 2, player.manaBottle.getWidth() * MyGame.ratioDeviceScreenToGameWight, player.manaBottle.getHeight() * MyGame.ratioDeviceScreenToGameHeight);
-            manaDistance =- player.manaBottle.getWidth();
+            sb.draw(player.manaBottle, manaDistanceX, manaDistanceY, player.manaBottle.getWidth() , player.manaBottle.getHeight());
+           manaDistanceX = manaDistanceX - player.manaBottle.getWidth()* MyGame.ratioDeviceScreenToGameWight;
         }
-        for (int i = 0; i < player.getManaPool() - player.getMana(); i++) {
-            sb.draw(player.manaBottleNull, manaDistance, MyGame.HEIGHT / 2);
-            manaDistance =- player.manaBottle.getWidth();
-        }
-        }
-        /*switch (player.name){
-            case TIGER: {
-                float manaDistance = MyGame.WIGHT - 4 - 2 * player.manaBottle.getWidth();
-                for (int i = 0; i < player.getMana(); i++) {
-                    sb.draw(player.manaBottle, manaDistance, 0, player.manaBottle.getWidth() * MyGame.ratioDeviceScreenToGameWight, player.manaBottle.getHeight() * MyGame.ratioDeviceScreenToGameHeight);
-                    manaDistance =- player.manaBottle.getWidth();
-                }
-                for (int i = 0; i < player.getManaPool() - player.getMana(); i++) {
-                    sb.draw(player.manaBottleNull, manaDistance, 0);
-                    manaDistance =- player.manaBottle.getWidth();
-                }
-                break;
-            }
-            case PHOENIX: {
-                float manaDistance = MyGame.WIGHT - 4 - player.manaBottle.getWidth() * 10;
-                for (int i = 0; i < player.getMana(); i++) {
-                    sb.draw(player.manaBottle, manaDistance, MyGame.HEIGHT - player.manaBottle.getHeight());
-                    manaDistance =+ player.manaBottle.getWidth();
-                }
-                for (int i = 0; i < player.getManaPool() - player.getMana(); i++) {
-                    sb.draw(player.manaBottleNull, manaDistance, MyGame.HEIGHT - player.manaBottle.getHeight());
-                    manaDistance =- player.manaBottle.getWidth();
-                }
-            }
-        }*/
+
+    }
 
 
   private class TimerForOneStroke extends TimerTask {

@@ -20,6 +20,7 @@ public class HeroCard extends Card {
 
     private TypeOfHeroCard typeOfHeroCard;
 
+    private Texture manaForUseTexture;
 
     private Texture characterTexture;
 
@@ -152,6 +153,19 @@ public class HeroCard extends Card {
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_CRITICALHIT.png");
                 break;
         }
+        switch (manaForUse){
+            case 0: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/0mana.png");break;
+            case 1: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/1mana.png");break;
+            case 2: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/2mana.png");break;
+            case 3: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/3mana.png");break;
+            case 4: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/4mana.png");break;
+            case 5: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/5mana.png");break;
+            case 6: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/6mana.png");break;
+            case 7: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/7mana.png");break;
+            case 8: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/8mana.png");break;
+            case 9: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/9mana.png");break;
+            case 10: manaForUseTexture = new Texture("manaFolder/cardManaPhoenix/10mana.png");break;
+        }
     }
 
 
@@ -279,6 +293,10 @@ public class HeroCard extends Card {
     }
 
     public Texture getCardBackgroundTexture() {return cardBackgroundTexture;}
+
+
+    public Texture getManaForUseTexture() {return manaForUseTexture;}
+
 
 
 

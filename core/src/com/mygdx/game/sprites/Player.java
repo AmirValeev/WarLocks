@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.MyGame;
 
 
+
 public class Player  {
     public TypesOfPlayers name;
 

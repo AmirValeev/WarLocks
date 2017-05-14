@@ -1,11 +1,8 @@
 package com.mygdx.game.states;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.mygdx.game.sprites.Card;
-import com.mygdx.game.states.GameStateManager;
 
 import java.util.ArrayList;
 
