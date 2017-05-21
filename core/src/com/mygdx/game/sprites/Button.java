@@ -1,5 +1,7 @@
 package com.mygdx.game.sprites;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.MyGame;
@@ -19,6 +21,8 @@ public class Button {
     private Texture textureBeforeTouched;
     private Texture textureAfterTouched;
 
+    private Sound clickSound;
+
     private Texture texture;
     public boolean pressed = false;
 
@@ -27,9 +31,11 @@ public class Button {
         this.textureAfterTouched = textureAfterTouched;
         this.textureBeforeTouched = textureBeforeTouched;
         texture = textureBeforeTouched;
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("sounds/clickSound.mp3"));
     }
 
     public void onTouched(){
+        clickSound.play();
         if (pressed)
             texture = textureAfterTouched;
         else
@@ -40,6 +46,7 @@ public class Button {
         textureAfterTouched.dispose();
         textureBeforeTouched.dispose();
         texture.dispose();
+        clickSound.dispose();
     }
 
     public Vector3 getPosition() {

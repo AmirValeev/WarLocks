@@ -22,6 +22,8 @@ public class HeroCard extends Card {
 
     private Texture manaForUseTexture;
 
+    private Texture name;
+
     private Texture characterTexture;
 
     private Texture typeOfHeroSkillTexture;
@@ -35,17 +37,20 @@ public class HeroCard extends Card {
     private int damage;
 
     private TypeOfSuperSkillsHero superSkill;
+
+    private String superSkillDescription;
+
     private int intSuperSkill = (int) (Math.random() * 5 + 1);
 
-    private int criticalChance = (int) (Math.random() * 65 + 15);
-    private int criticalFactor = 800 - (criticalChance-15) * 10;
-    private int procentOfVampirism = (int) (Math.random()*60+20);
+    private int criticalChance = (int) (Math.random() * 40 + 15);
+    private int criticalFactor = 400 - (criticalChance-15) * 10;
+    private int procentOfVampirism = (int) (Math.random() * 10+20);
     private int procentToBlockDamage = (int) (Math.random() * 20 +20);
     private double blockFactor = (70 - (procentToBlockDamage-20)) / 10;
 
-  /*  public float transparency = 100;
+    public float transparency = 100;
     private float velocityOfTransparency = 100;
-*/
+
 
     private void setStats() {
         int typeOfHero = (int) (Math.random() * 3 + 1);
@@ -67,19 +72,23 @@ public class HeroCard extends Card {
                     case 3:
                     case 4: characterTexture = new Texture("characters/force_character1.png");
                             cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
+                            name = new Texture("cards/namesOfCards/meleeWarrior.png");
                         break;
                     case 5:
                     case 6:
                     case 7: characterTexture = new Texture("characters/force_character2.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/rareWallCard.png");
+                        name = new Texture("cards/namesOfCards/meleeKnight.png");
                         break;
                     case 8:
                     case 9:
                     case 10: characterTexture = new Texture("characters/force_character3.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/mythticalWallCard.png");
+                        name = new Texture("cards/namesOfCards/meleeBerserk.png");
                         break;
                     default: characterTexture = new Texture("characters/lox_character.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
+                        name = new Texture("cards/namesOfCards/peasant.png");
                 }
                 break;
             case 2:
@@ -99,19 +108,23 @@ public class HeroCard extends Card {
                     case 3:
                     case 4: characterTexture = new Texture("characters/agility_character1.png");
                             cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
+                            name = new Texture("cards/namesOfCards/thiefJostler.png");
                         break;
                     case 5:
                     case 6:
                     case 7: characterTexture = new Texture("characters/agility_character2.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/rareWallCard.png");
+                        name = new Texture("cards/namesOfCards/thiefAssasin.png");
                         break;
                     case 8:
                     case 9:
                     case 10: characterTexture = new Texture("characters/agility_character3.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/mythticalWallCard.png");
+                        name = new Texture("cards/namesOfCards/thiefRinglader.png");
                         break;
                     default: characterTexture = new Texture("characters/lox_character.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
+                        name = new Texture("cards/namesOfCards/peasant.png");
                 }
 
                 break;
@@ -132,38 +145,47 @@ public class HeroCard extends Card {
                     case 3:
                     case 4: characterTexture = new Texture("characters/intelegence_character1.png");
                             cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
+                            name = new Texture("cards/namesOfCards/wizardRokkie.png");
                         break;
                     case 5:
                     case 6:
                     case 7: characterTexture = new Texture("characters/intelegence_character2.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/rareWallCard.png");
+                        name = new Texture("cards/namesOfCards/wizardMaster.png");
                         break;
                     case 8:
                     case 9:
                     case 10: characterTexture = new Texture("characters/intelegence_character3.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/mythticalWallCard.png");
+                        name = new Texture("cards/namesOfCards/wizardWisest.png");
                         break;
                     default: characterTexture = new Texture("characters/lox_character.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
+                        name = new Texture("cards/namesOfCards/peasant.png");
                 }
 
                 break;
         }
         switch (intSuperSkill) {
             case 1: superSkill = TypeOfSuperSkillsHero.VAMPIRE;
+                superSkillDescription = "Return " + procentOfVampirism + "% of \ninflicted damage.";
                     typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_VAMPIRE.png");
                 break;
             case 2: superSkill = TypeOfSuperSkillsHero.BLOCKINGDAMAGE;
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_BLOCKINGDAMAGE.png");
+                superSkillDescription = "Have " + procentToBlockDamage + "% chance \nto block " + blockFactor + "%\nof taken damage.";
                 break;
             case 3: superSkill = TypeOfSuperSkillsHero.INCONSTANTOFSTATS;
+                superSkillDescription = "Change shape\nevery hit.";
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_INCONSTANTSTATS.png");
                 break;
             case 4: superSkill = TypeOfSuperSkillsHero.ADDDAMAGEBYLOWHEALTHPOINT;
+                superSkillDescription = "Health decreases,\ndamage increases.";
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_ADDDAMAGEBYLOWHP.png");
                 break;
             case 5: superSkill = TypeOfSuperSkillsHero.CRITICALHIT;
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_CRITICALHIT.png");
+                superSkillDescription = "Have " + criticalChance + "% to inflict \n" + criticalFactor + "% increased \ndamage.";
                 break;
         }
         if (numberOfPlayer == 2)
@@ -201,6 +223,7 @@ public class HeroCard extends Card {
 
 
     public void hit(HeroCard enemy){
+        enemy.effectTexture = new Texture("skillEffects/simpleAttack.png");
         if((int)(Math.random() * 100 + 1) > enemy.armor)
         switch (superSkill) {
             case VAMPIRE: {
@@ -280,6 +303,23 @@ public class HeroCard extends Card {
         if (enemy.healthPoints <= 0) enemy.setStatusOfCard("Is Dead");
         this.healthPoints -= enemy.damage;
         if (this.healthPoints <= 0) this.setStatusOfCard("Is Dead");
+        enemy.transparency = 0;
+        enemy.velocityOfTransparency = 0;
+        transparency = 0;
+        velocityOfTransparency = 0;
+    }
+
+    public void setTransparencyForEffects( float dt, float accelerationOfTransparency) {
+        if (transparency < 100) {
+            velocityOfTransparency = velocityOfTransparency + accelerationOfTransparency;
+            velocityOfTransparency = velocityOfTransparency * dt;
+            if (transparency + velocityOfTransparency < 100)
+                transparency = transparency + velocityOfTransparency;
+            else
+                transparency = 100;
+            velocityOfTransparency = velocityOfTransparency * (1 / dt);
+
+        } else transparency = 100;
     }
 
   /*  public float setTransparency(float transparency, float dt, float accelerationOfTransparency){
@@ -353,10 +393,11 @@ public class HeroCard extends Card {
 
     public Texture getCardBackgroundTexture() {return cardBackgroundTexture;}
 
-
     public Texture getManaForUseTexture() {return manaForUseTexture;}
 
+    public Texture getName() {return name;}
 
+    public String getSuperSkillDescription() {return superSkillDescription;}
 
 
 }

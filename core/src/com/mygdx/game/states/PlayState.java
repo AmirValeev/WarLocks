@@ -2,6 +2,7 @@ package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -30,6 +31,7 @@ import java.util.TimerTask;
 
 
 class PlayState extends State {
+
     private boolean gameEnded;
     private int winner;
 
@@ -67,8 +69,6 @@ class PlayState extends State {
     private Texture hpPin;
     private Texture armorPin;
 
-    private Texture blockDmg, criticalHit, skillAvoid, vampireEffect;
-
     private TimerForOneStroke timerForOneStroke;
     private Timer timer;
 
@@ -76,26 +76,17 @@ class PlayState extends State {
     private float velocityOfTransparency = 0;
     private float transparency = 0;
     private float transparencyForSounds = 0;
-    private float transparencyForEffects = 0;
 
 
     private Music fonMusic;
+    private Sound winSound;
 
     private Button backToMenu;
     private boolean buttonPressed;
 
 
-    //    HeroCard TESTCARD;
-
-
     PlayState(GameStateManager gsm) {
         super(gsm);
-
-      /*  blockDmg = new Texture("skillEffects/blockDmgEffect.png");
-        criticalHit = new Texture("skillEffects/criticalHitEffect.png");
-        skillAvoid = new Texture("skillEffects/skillAvoidEffect.png");
-        vampireEffect = new Texture("skillEffects/vampireEffect.png");
-*/
 
         backgroundRyab = new Texture("backgroundRyab.png");
 
@@ -130,6 +121,8 @@ class PlayState extends State {
         fonMusic.setLooping(true);
         fonMusic.setVolume(0);
         fonMusic.play();
+
+        winSound = Gdx.audio.newSound(Gdx.files.internal("sounds/winSound.mp3"));
 
         cards = new ArrayList<HeroCard>();
         positions = new Array<Positions>();
@@ -188,19 +181,17 @@ class PlayState extends State {
 
     @Override
     public void update(float dt) {
-        //     TESTCARD.ANGLETEST++;
         fonMusic.setVolume(transparencyForSounds / 100);
 
         transparency = setTransparency(transparency, dt, 4);
         transparencyForSounds = setTransparency(transparencyForSounds, dt, 20);
-        transparencyForEffects = setTransparency(transparencyForEffects, dt, 4);
 
         handleInput(dt);
         int countCardOfFirst = 0;
         int countCardOfSecond = 0;
 
         for (int i = 0; i < cards.size(); i++) {
-        //    cards.get(i).setTransparency(cards.get(i).transparency, dt, -2);
+            cards.get(i).setTransparencyForEffects(dt, 4);
             if (cards.get(i).getStatusOfCard().equals("Is Dead")) {
                 for (Positions pos : fightPositions) {
                     if (cards.get(i).getPosition() == pos.getPosition())
@@ -235,6 +226,8 @@ class PlayState extends State {
                 timerForOneStroke.cancel();
                 finishWindow = new Texture("finishOfGame/windowPhoenix.png");
                 winner = 1;
+                backToMenu = new Button((MyGame.WIGHT - Button.WIGHT) / 2, MyGame.HEIGHT - 100, new Texture("menuAssets/toMenuBtn/backToMenuBefore.png"), new Texture("menuAssets/toMenuBtn/backToMenuAfter.png"));
+                winSound.play();
             }
             if (countCardOfSecond == 0) {
                 gameEnded = true;
@@ -242,8 +235,9 @@ class PlayState extends State {
                 timer.cancel();
                 timerForOneStroke.cancel();
                 winner = 2;
+                backToMenu = new Button((MyGame.WIGHT - Button.WIGHT) / 2, 100 - Button.HEIGHT, new Texture("menuAssets/toMenuBtn/backToMenuBefore.png"), new Texture("menuAssets/toMenuBtn/backToMenuAfter.png"));
+                winSound.play();
             }
-
         }
 
         for (Card card : cards) {
@@ -283,13 +277,11 @@ class PlayState extends State {
         sb.setTransformMatrix(m4VerticalText);
         verticalBitmap.draw(sb, "" + timerForOneStroke.getTime(), 0, 0);
 
-        //  bitmapForTextOfFirst.draw(sb, "" + player1.getMana(), MyGame.WIGHT - 20, Card.CARD_WIGHT);
-        // bitmapForTextOfSecond.draw(sb, "" + player2.getMana(), 18, MyGame.HEIGHT - Card.CARD_HEIGHT - 10);
+
         sb.setTransformMatrix(defaultMatrix);
         manaDrawer(sb, player1);
         manaDrawer(sb, player2);
 
-        //      cardDrawer(TESTCARD,sb, shapeRenderer, 0.7f, TESTCARD.ANGLETEST);
 
         sb.setColor(1, 1, 1, transparencyForSounds / 100);
         for (Positions pos : positions)
@@ -317,16 +309,14 @@ class PlayState extends State {
             backToMenuChecker();
             sb.setColor(1, 1, 1, transparency / 100);
             sb.draw(backgroundRyab, 0, 0);
-            sb.draw(finishWindow, 0, 0, finishWindow.getWidth() * MyGame.ratioDeviceScreenToGameWight, finishWindow.getHeight() * MyGame.ratioDeviceScreenToGameHeight, 0, 0, finishWindow.getWidth(), finishWindow.getHeight(), true, true);
+            sb.draw(finishWindow, 0, 0, finishWindow.getWidth() , finishWindow.getHeight(), 0, 0, finishWindow.getWidth(), finishWindow.getHeight(), false, true);
             switch (winner){
                 case 2:
-                    backToMenu = new Button((MyGame.WIGHT - Button.WIGHT) / 2, 100 - Button.HEIGHT, new Texture("menuAssets/toMenuBtn/backToMenuBefore.png"), new Texture("menuAssets/toMenuBtn/backToMenuAfter.png"));
                     sb.draw(backToMenu.getTexture(), backToMenu.getPosition().x, backToMenu.getPosition().y, backToMenu.getTextureAfterTouched().getWidth(),backToMenu.getTextureAfterTouched().getHeight(),0,0, backToMenu.getTextureAfterTouched().getWidth(), backToMenu.getTextureAfterTouched().getHeight(), true, false);
                     break;
                 case 1:
-                    backToMenu = new Button((MyGame.WIGHT - Button.WIGHT) / 2, MyGame.HEIGHT - 100, new Texture("menuAssets/toMenuBtn/backToMenuBefore.png"), new Texture("menuAssets/toMenuBtn/backToMenuAfter.png"));
                     sb.draw(backToMenu.getTexture(), backToMenu.getPosition().x, backToMenu.getPosition().y, backToMenu.getTextureAfterTouched().getWidth(),backToMenu.getTextureAfterTouched().getHeight(),0,0, backToMenu.getTextureAfterTouched().getWidth(), backToMenu.getTextureAfterTouched().getHeight(), false, true);
-
+                    break;
             }
             sb.setColor(1, 1, 1, 1);
         }
@@ -357,9 +347,11 @@ class PlayState extends State {
             card.getCardBackgroundTexture().dispose();
             card.getCardLightningTexture().dispose();
             card.effectTexture.dispose();
+            card.getName().dispose();
         }
         fonMusic.dispose();
         backToMenu.dispose();
+        winSound.dispose();
     }
 
     @Override
@@ -387,7 +379,6 @@ class PlayState extends State {
                     indexOfPickedCard = indexC;
                 }
             } else {
-                transparencyForEffects = 0;
                 transparency = 0;
                 velocityOfTransparency = 0;
                 if (card.isHaveActivated()) {
@@ -467,14 +458,6 @@ class PlayState extends State {
 
         }
     }
-
-  /*  private void profileSwipeChecker(Player player){
-        if(Gdx.input.isTouched()
-                && Gdx.input.getX() > player.getPlayerPos().x &&  Gdx.input.getX() < player.getPlayerPos().x + player.getPlayerTexture().getWidth()
-                && Gdx.input.getY() > player.getPlayerPos().y &&  Gdx.input.getY() < player.getPlayerPos().y + player.getPlayerTexture().getHeight())
-
-
-    }*/
 
     private void skipStokeButtonChecker() {
         if (Gdx.input.isTouched() && Gdx.input.getX() > positionOfSkipBtn.x && Gdx.input.getY() > positionOfSkipBtn.y && Gdx.input.getY() < positionOfSkipBtn.y + skipBtn.getHeight() * MyGame.ratioDeviceScreenToGameHeight && !cardChoosed) {
@@ -571,12 +554,9 @@ class PlayState extends State {
             sb.draw(card.getCardLightningTexture(), card.getPosition().x - (card.getCardLightningTexture().getWidth() / 2 - card.getCardDefault().getWidth() / 2) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y - (card.getCardLightningTexture().getHeight() / 2 - card.getCardDefault().getHeight() / 2) * MyGame.ratioDeviceScreenToGameHeight, card.getCardLightningTexture().getWidth() * scope, card.getCardLightningTexture().getHeight() * scope);
                sb.setColor(1, 1, 1, 1);
         }
-        /*  if (card.isHaveActivated())
-            sb.draw(card.getStatsBlock().getStatsBlockTexture(), card.getStatsBlock().getStartPosition().x + card.getStatsBlock().getPosition().x, card.getStatsBlock().getStartPosition().y, card.getStatsBlock().getStatsBlockTexture().getWidth() * scope, card.getStatsBlock().getStatsBlockTexture().getHeight() * scope);
-*/
 
         if (card.numberOfPlayer == 1) {
-            sb.setColor(1, 1, 1,  (100 - transparencyForEffects) / 100);
+            sb.setColor(1, 1, 1,  (100 - card.transparency) / 100);
             sb.draw(card.effectTexture, card.getPosition().x - (card.effectTexture.getWidth() - card.getCardDefault().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y - (card.effectTexture.getHeight() - card.getCardDefault().getHeight()) / 2 * MyGame.ratioDeviceScreenToGameHeight,
                     card.effectTexture.getWidth() / 2, (card.effectTexture.getHeight() - card.getCardDefault().getHeight()) / 2, card.effectTexture.getWidth(), card.effectTexture.getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.effectTexture.getWidth(), card.effectTexture.getHeight(), false, false);
             sb.setColor(1, 1, 1, 1);
@@ -586,6 +566,11 @@ class PlayState extends State {
 
             sb.draw(card.getCardBackgroundTexture(), card.getPosition().x + (Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + (Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 * MyGame.ratioDeviceScreenToGameHeight,
                     card.getCardBackgroundTexture().getWidth() / 2, (card.getCardBackgroundTexture().getHeight() - card.getCardDefault().getHeight()) / 2, card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), false, false);
+
+            if (!card.isHaveActivated())
+                sb.draw(card.getName(), card.getPosition().x - (card.getCardTexture().getWidth() - card.getCardDefault().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y - (card.getCardTexture().getHeight() - card.getCharacterTexture().getHeight()) * MyGame.ratioDeviceScreenToGameHeight,
+                        card.getCardTexture().getWidth() / 2, card.getCardTexture().getHeight() - card.getCardDefault().getHeight(), card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), true, false);
+
 
             if (!card.isHaveActivated())
                 sb.draw(card.getManaForUseTexture(), card.getPosition().x - (card.getCardTexture().getWidth() - card.getCardDefault().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight + (card.getCardTexture().getWidth() - card.getManaForUseTexture().getWidth()) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y - (card.getCardTexture().getHeight() - card.getCharacterTexture().getHeight()) * MyGame.ratioDeviceScreenToGameHeight + (card.getCardTexture().getHeight() - card.getManaForUseTexture().getHeight()) * MyGame.ratioDeviceScreenToGameHeight,
@@ -606,7 +591,11 @@ class PlayState extends State {
                 if (scope == .9f) {
                     bitmapForTextOfFirst.draw(sb, Integer.toString(card.getDamage()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + card.getCardBackgroundTexture().getWidth() - damagePin.getWidth() - 12) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + 40) * MyGame.ratioDeviceScreenToGameHeight);
                     bitmapForTextOfFirst.draw(sb, Integer.toString(card.getHealthPoints()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + 12) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + 40) * MyGame.ratioDeviceScreenToGameHeight);
-                } else {
+                  if (!card.isHaveActivated()) {
+                      bitmapForTextOfFirst.getData().setScale(0.25f * scope * MyGame.ratioDeviceScreenToGameWight, 0.2f * scope * MyGame.ratioDeviceScreenToGameHeight);
+                      bitmapForTextOfFirst.draw(sb, card.getSuperSkillDescription(), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 - 10) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 - 35) * MyGame.ratioDeviceScreenToGameHeight);
+                  }
+                  } else {
                     bitmapForTextOfFirst.draw(sb, Integer.toString(card.getDamage()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + card.getCardBackgroundTexture().getWidth() - damagePin.getWidth() - 12 - 5) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + 35) * MyGame.ratioDeviceScreenToGameHeight);
                     bitmapForTextOfFirst.draw(sb, Integer.toString(card.getHealthPoints()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + 12 + 15) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + 35) * MyGame.ratioDeviceScreenToGameHeight);
                 }
@@ -616,6 +605,10 @@ class PlayState extends State {
             sb.draw(baitPoint, -1000, -1000);
 
         } else {
+            sb.setColor(1, 1, 1,  (100 - card.transparency) / 100);
+            sb.draw(card.effectTexture, card.getPosition().x - (card.effectTexture.getWidth() - Card.CARD_WIGHT) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y - (card.effectTexture.getHeight() - card.getCardDefault().getHeight()) / 2 * MyGame.ratioDeviceScreenToGameHeight,
+                    card.effectTexture.getWidth() / 2, (card.effectTexture.getHeight() - card.getCardDefault().getHeight()) / 2 + Card.CARD_HEIGHT, card.effectTexture.getWidth(), card.effectTexture.getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.effectTexture.getWidth(), card.effectTexture.getHeight(), false, false);
+            sb.setColor(1, 1, 1, 1);
             if (!card.isHaveActivated())
                 sb.draw(card.getCardTexture(), card.getPosition().x + (Card.CARD_WIGHT - card.getCardTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y,
                         card.getCardTexture().getWidth() / 2, card.getCardDefault().getHeight(), card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), true, false);
@@ -623,12 +616,11 @@ class PlayState extends State {
             sb.draw(card.getCardBackgroundTexture(), card.getPosition().x + (Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + (Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 * MyGame.ratioDeviceScreenToGameHeight,
                     card.getCardBackgroundTexture().getWidth() / 2, (card.getCardBackgroundTexture().getHeight() - card.getCardDefault().getHeight()) / 2 + card.getCardDefault().getHeight(), card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardBackgroundTexture().getWidth(), card.getCardBackgroundTexture().getHeight(), false, false);
 
-           /*if (card.onTouched || card.isHaveActivated()) //{
-                sb.draw(healthPointBar, card.getPosition().x, card.getPosition().y + Card.CARD_HEIGHT * MyGame.ratioDeviceScreenToGameHeight , healthPointBar.getWidth() / 2 , 0, healthPointBar.getWidth(), healthPointBar.getHeight(),
-                        1 * scope, 1 * scope, angle, 0, 0, healthPointBar.getWidth(), healthPointBar.getHeight(), false, false);
-/*
-                shapeRenderer.rect(card.getPosition().x + 4 * MyGame.ratioDeviceScreenToGameWight , card.getPosition().y + (2 + Card.CARD_HEIGHT) * MyGame.ratioDeviceScreenToGameHeight , ((float) 106 / card.getHealthPool()) * card.getHealthPoints() * scope * MyGame.ratioDeviceScreenToGameWight, 8 * scope * MyGame.ratioDeviceScreenToGameHeight);
-            }*/
+            if (!card.isHaveActivated())
+                sb.draw(card.getName(), card.getPosition().x + (Card.CARD_WIGHT - card.getCardTexture().getWidth()) / 2 * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y,
+                        card.getCardTexture().getWidth() / 2, card.getCardDefault().getHeight(), card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), 1 * scope, 1 * scope, angle, 0, 0, card.getCardTexture().getWidth(), card.getCardTexture().getHeight(), false, true);
+
+
             sb.draw(card.getCharacterTexture(), card.getPosition().x, card.getPosition().y, card.getCharacterTexture().getWidth() / 2, card.getCardDefault().getHeight(),
                     card.getCharacterTexture().getWidth(), card.getCharacterTexture().getHeight(), 1 * scope, 1 * scope, angle,
                     0, 0, card.getCharacterTexture().getWidth(), card.getCharacterTexture().getHeight(), true, true);
@@ -646,12 +638,13 @@ class PlayState extends State {
                         damagePin.getWidth(), damagePin.getHeight(), 1 * scope, 1 * scope, angle, 0, 0, damagePin.getWidth(), damagePin.getHeight(), false, false);
                 sb.draw(hpPin, card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + card.getCardBackgroundTexture().getWidth() - 12 - hpPin.getWidth()) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + card.getCardBackgroundTexture().getHeight() - damagePin.getHeight() - 15) * MyGame.ratioDeviceScreenToGameHeight,
                         hpPin.getWidth() + 12 - card.getCardBackgroundTexture().getWidth() / 2, (card.getCardBackgroundTexture().getHeight() - card.getCardDefault().getHeight()) / 2 + card.getCardDefault().getHeight() - card.getCardBackgroundTexture().getHeight() + damagePin.getHeight() + 15, hpPin.getWidth(), hpPin.getHeight(), 1 * scope, 1 * scope, angle, 0, 0, hpPin.getWidth(), hpPin.getHeight(), false, true);
-                //  sb.draw(armorPin, card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + card.getCardBackgroundTexture().getWidth() - 12 - hpPin.getWidth())* MyGame.ratioDeviceScreenToGameWight, card.getPosition().y, hpPin.getWidth() + 12 - card.getCardBackgroundTexture().getWidth() / 2, card.getCardDefault().getHeight(),
-                //        armorPin.getWidth(), armorPin.getHeight(), 1 * scope, 1 * scope, angle, 0, 0, armorPin.getWidth(), armorPin.getHeight(), false, false);
-
                 if (scope == .9f) {
                     bitmapForTextOfSecond.draw(sb, Integer.toString(card.getDamage()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + 12 + 8) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + card.getCardBackgroundTexture().getHeight() - damagePin.getHeight() - 15 + 5) * MyGame.ratioDeviceScreenToGameHeight);
                     bitmapForTextOfSecond.draw(sb, Integer.toString(card.getHealthPoints()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + card.getCardBackgroundTexture().getWidth() - 12 - 2 - hpPin.getWidth()) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + card.getCardBackgroundTexture().getHeight() - damagePin.getHeight() - 15 + 4) * MyGame.ratioDeviceScreenToGameHeight);
+                    if (!card.isHaveActivated()){
+                        bitmapForTextOfSecond.getData().setScale(0.25f * scope * MyGame.ratioDeviceScreenToGameWight, 0.2f * scope * MyGame.ratioDeviceScreenToGameHeight);
+                    bitmapForTextOfSecond.draw(sb, card.getSuperSkillDescription(), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 - 10) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + 200) * MyGame.ratioDeviceScreenToGameHeight);
+                }
                 } else if (scope == .7f) {
                     bitmapForTextOfSecond.draw(sb, Integer.toString(card.getDamage()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + 12 + 19) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + card.getCardBackgroundTexture().getHeight() - damagePin.getHeight() - 15 + 10) * MyGame.ratioDeviceScreenToGameHeight);
                     bitmapForTextOfSecond.draw(sb, Integer.toString(card.getHealthPoints()), card.getPosition().x + ((Card.CARD_WIGHT - card.getCardBackgroundTexture().getWidth()) / 2 + card.getCardBackgroundTexture().getWidth() - 12 - 8 - hpPin.getWidth()) * MyGame.ratioDeviceScreenToGameWight, card.getPosition().y + ((Card.CARD_HEIGHT - card.getCardBackgroundTexture().getHeight()) / 2 + card.getCardBackgroundTexture().getHeight() - damagePin.getHeight() - 15 + 10) * MyGame.ratioDeviceScreenToGameHeight);

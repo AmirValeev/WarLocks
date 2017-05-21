@@ -2,6 +2,7 @@ package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.game.MyGame;
@@ -25,6 +26,8 @@ public class MenuState extends State {
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
+        camera = new OrthographicCamera();
+        camera.setToOrtho(true, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         background = new Texture("menuAssets/background.png");
         backgroundLoading = new Texture("menuAssets/backgroundLoading.png");
         playBtn = new Button((MyGame.WIGHT - Button.WIGHT ) / 2, (MyGame.HEIGHT - Button.HEIGHT) / 2, new Texture("menuAssets/playBtn/playBtnBeforePressed.png"),new Texture("menuAssets/playBtn/playBtnAfterPressed.png"));

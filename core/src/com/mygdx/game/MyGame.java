@@ -31,6 +31,8 @@ public class MyGame extends ApplicationAdapter {
 		gsm = new GameStateManager();
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		gsm.push(new MenuState(gsm));
+
+
 	}
 
 	@Override
@@ -40,6 +42,7 @@ public class MyGame extends ApplicationAdapter {
 		gsm.render(batch, shapeRenderer);
 	}
 	public void dispose(){
+		super.dispose();
 		batch.dispose();
 		shapeRenderer.dispose();
 	}

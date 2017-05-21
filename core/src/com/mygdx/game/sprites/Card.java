@@ -27,7 +27,6 @@ public abstract class Card  {
     public int numberOfPlayer;
     public boolean onTouched;
 
-    boolean canBeAttack = false;
     boolean haveUsed = false;
     private boolean slotUsage = true;
     private boolean haveActivated = false;
