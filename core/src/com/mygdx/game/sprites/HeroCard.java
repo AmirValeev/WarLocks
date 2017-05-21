@@ -1,6 +1,8 @@
 package com.mygdx.game.sprites;
 
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 
 
@@ -13,12 +15,14 @@ public class HeroCard extends Card {
         super(x, y);
         this.numberOfPlayer = numberOfPlayer;
         setStats();
-
+        superSkillSound = Gdx.audio.newSound(Gdx.files.internal("sounds/simpleHit.mp3"));
     }
 
     public int ANGLETEST;
 
     private TypeOfHeroCard typeOfHeroCard;
+
+    private Sound superSkillSound;
 
     private Texture manaForUseTexture;
 
@@ -86,7 +90,7 @@ public class HeroCard extends Card {
                         cardBackgroundTexture = new Texture("cardBkgTexturs/mythticalWallCard.png");
                         name = new Texture("cards/namesOfCards/meleeBerserk.png");
                         break;
-                    default: characterTexture = new Texture("characters/lox_character.png");
+                    default: characterTexture = new Texture("characters/people_character.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
                         name = new Texture("cards/namesOfCards/peasant.png");
                 }
@@ -122,7 +126,7 @@ public class HeroCard extends Card {
                         cardBackgroundTexture = new Texture("cardBkgTexturs/mythticalWallCard.png");
                         name = new Texture("cards/namesOfCards/thiefRinglader.png");
                         break;
-                    default: characterTexture = new Texture("characters/lox_character.png");
+                    default: characterTexture = new Texture("characters/people_character.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
                         name = new Texture("cards/namesOfCards/peasant.png");
                 }
@@ -159,7 +163,7 @@ public class HeroCard extends Card {
                         cardBackgroundTexture = new Texture("cardBkgTexturs/mythticalWallCard.png");
                         name = new Texture("cards/namesOfCards/wizardWisest.png");
                         break;
-                    default: characterTexture = new Texture("characters/lox_character.png");
+                    default: characterTexture = new Texture("characters/people_character.png");
                         cardBackgroundTexture = new Texture("cardBkgTexturs/commonWallCard.png");
                         name = new Texture("cards/namesOfCards/peasant.png");
                 }
@@ -168,8 +172,9 @@ public class HeroCard extends Card {
         }
         switch (intSuperSkill) {
             case 1: superSkill = TypeOfSuperSkillsHero.VAMPIRE;
-                superSkillDescription = "Return " + procentOfVampirism + "% of \ninflicted damage.";
+                    superSkillDescription = "Return " + procentOfVampirism + "% of \ninflicted damage.";
                     typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_VAMPIRE.png");
+
                 break;
             case 2: superSkill = TypeOfSuperSkillsHero.BLOCKINGDAMAGE;
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_BLOCKINGDAMAGE.png");
@@ -186,6 +191,7 @@ public class HeroCard extends Card {
             case 5: superSkill = TypeOfSuperSkillsHero.CRITICALHIT;
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_CRITICALHIT.png");
                 superSkillDescription = "Have " + criticalChance + "% to inflict \n" + criticalFactor + "% increased \ndamage.";
+                superSkillSound = Gdx.audio.newSound(Gdx.files.internal("sounds/criticalHit.mp3"));
                 break;
         }
         if (numberOfPlayer == 2)
@@ -282,6 +288,7 @@ public class HeroCard extends Card {
                         enemy.healthPoints = (int) (enemy.healthPoints - this.damage + this.damage * (enemy.blockFactor / 10));
                     else {
                         enemy.healthPoints = (int) (enemy.healthPoints - (this.damage * criticalFactor) + this.damage * (enemy.blockFactor / 10));
+                        superSkillSound.play();
                         effectTexture = new Texture("skillEffects/criticalHitEffect.png");
                     }
                 } else {
@@ -290,14 +297,17 @@ public class HeroCard extends Card {
                         enemy.healthPoints = enemy.healthPoints - this.damage;
                     else {
                         enemy.healthPoints = enemy.healthPoints - (this.damage * criticalFactor);
+                        superSkillSound.play();
                         effectTexture = new Texture("skillEffects/criticalHitEffect.png");
                     }
                 }
             }
         }
         else  {
+            enemy.setSuperSkillSound(Gdx.audio.newSound(Gdx.files.internal("sounds/criticalHit.mp3")));
             enemy.healthPoints -= damage;
             enemy.effectTexture = new Texture("skillEffects/skillAvoidEffect.png");
+            enemy.superSkillSound.play();
          }
         this.haveUsed = true;
         if (enemy.healthPoints <= 0) enemy.setStatusOfCard("Is Dead");
@@ -398,6 +408,11 @@ public class HeroCard extends Card {
     public Texture getName() {return name;}
 
     public String getSuperSkillDescription() {return superSkillDescription;}
+
+    public Sound getSuperSkillSound() {return superSkillSound;}
+
+    public void setSuperSkillSound(Sound superSkillSound) {this.superSkillSound = superSkillSound;}
+
 
 
 }

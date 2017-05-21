@@ -184,7 +184,7 @@ class PlayState extends State {
         fonMusic.setVolume(transparencyForSounds / 100);
 
         transparency = setTransparency(transparency, dt, 4);
-        transparencyForSounds = setTransparency(transparencyForSounds, dt, 20);
+        transparencyForSounds = setTransparency(transparencyForSounds, dt, 10);
 
         handleInput(dt);
         int countCardOfFirst = 0;
@@ -348,6 +348,7 @@ class PlayState extends State {
             card.getCardLightningTexture().dispose();
             card.effectTexture.dispose();
             card.getName().dispose();
+            card.getSuperSkillSound().dispose();
         }
         fonMusic.dispose();
         backToMenu.dispose();

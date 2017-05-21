@@ -32,6 +32,7 @@ public class Button {
         this.textureBeforeTouched = textureBeforeTouched;
         texture = textureBeforeTouched;
         clickSound = Gdx.audio.newSound(Gdx.files.internal("sounds/clickSound.mp3"));
+        clickSound.setVolume(10000, 0.05f);
     }
 
     public void onTouched(){
