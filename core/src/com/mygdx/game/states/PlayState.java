@@ -80,6 +80,7 @@ class PlayState extends State {
 
     private Music fonMusic;
     private Sound winSound;
+    private Sound skipBtnSound = Gdx.audio.newSound(Gdx.files.internal("sounds/skipStoke.mp3"));;
 
     private Button backToMenu;
     private boolean buttonPressed;
@@ -101,7 +102,7 @@ class PlayState extends State {
 
         positionOfSkipBtn = new Vector3((MyGame.WIGHT - skipBtn.getWidth()) * MyGame.ratioDeviceScreenToGameWight, (MyGame.HEIGHT / 2 - skipBtn.getHeight() / 2) * MyGame.ratioDeviceScreenToGameHeight, 0);
 
-        fightZone = new Rectangle(0, (MyGame.HEIGHT / 2 - 20) * MyGame.ratioDeviceScreenToGameHeight, MyGame.WIGHT * MyGame.ratioDeviceScreenToGameWight, 40 * MyGame.ratioDeviceScreenToGameHeight);
+        fightZone = new Rectangle(0, (MyGame.HEIGHT / 2 - 40) * MyGame.ratioDeviceScreenToGameHeight, MyGame.WIGHT * MyGame.ratioDeviceScreenToGameWight, 80 * MyGame.ratioDeviceScreenToGameHeight);
         camera = new OrthographicCamera();
         camera.setToOrtho(true, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -252,6 +253,7 @@ class PlayState extends State {
 
     @Override
     public void render(SpriteBatchWithRatio sb, ShapeRenderer shapeRenderer) {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         sb.begin();
         sb.setColor(1, 1, 1, 1);
@@ -259,7 +261,6 @@ class PlayState extends State {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.setColor(Color.GREEN);
         sb.setProjectionMatrix(camera.combined);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sb.draw(background, 0, 0);
         sb.draw(skipBtn, positionOfSkipBtn.x, positionOfSkipBtn.y, skipBtn.getWidth(), skipBtn.getHeight(), 0, 0, skipBtn.getWidth(), skipBtn.getHeight(), false, true);
@@ -348,11 +349,15 @@ class PlayState extends State {
             card.getCardLightningTexture().dispose();
             card.effectTexture.dispose();
             card.getName().dispose();
-            card.getSuperSkillSound().dispose();
+            card.superSkillSound.dispose();
+            card.using.dispose();
+            card.typicalHitSound.dispose();
         }
         fonMusic.dispose();
         backToMenu.dispose();
         winSound.dispose();
+        skipBtnSound.dispose();
+        System.out.println("PlayState Disposed");
     }
 
     @Override
@@ -438,6 +443,7 @@ class PlayState extends State {
                             break;
                         } else card.setPosition(card.getStartPos());
                     }
+                    card.using.play();
                     card.setHaveUsed(true);
                     card.setHaveActivated(true);
 
@@ -480,6 +486,7 @@ class PlayState extends State {
             else
                 skipBtn = new Texture("skipBtn/skipBtnPhoenix.png");
         }
+        skipBtnSound.play();
     }
     private void backToMenuChecker(){
         if (Gdx.input.isTouched()){

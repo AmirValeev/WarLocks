@@ -12,6 +12,7 @@ public class HeroCard extends Card {
 
     public HeroCard(float x, float y, int numberOfPlayer)
     {
+
         super(x, y);
         this.numberOfPlayer = numberOfPlayer;
         setStats();
@@ -20,9 +21,12 @@ public class HeroCard extends Card {
 
     public int ANGLETEST;
 
+    public Sound using = Gdx.audio.newSound(Gdx.files.internal("sounds/cardUsing.mp3"));
+
     private TypeOfHeroCard typeOfHeroCard;
 
-    private Sound superSkillSound;
+    public Sound superSkillSound;
+    public Sound typicalHitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/simpleHit.mp3"));
 
     private Texture manaForUseTexture;
 
@@ -47,10 +51,11 @@ public class HeroCard extends Card {
     private int intSuperSkill = (int) (Math.random() * 5 + 1);
 
     private int criticalChance = (int) (Math.random() * 40 + 15);
-    private int criticalFactor = 400 - (criticalChance-15) * 10;
-    private int procentOfVampirism = (int) (Math.random() * 10+20);
-    private int procentToBlockDamage = (int) (Math.random() * 20 +20);
-    private double blockFactor = (70 - (procentToBlockDamage-20)) / 10;
+    private int criticalFactor = 100 + 400 - (criticalChance-15) * 10;
+    private int percentOfVampirism = (int) (Math.random() * 10+20);
+    private int percentToBlockDamage = (int) (Math.random() * 20 +20);
+    private double blockFactor = (300 - (percentToBlockDamage-20)) / 10;
+    private double percentOfRage = Math.random() * 10 + 1;
 
     public float transparency = 100;
     private float velocityOfTransparency = 100;
@@ -172,21 +177,24 @@ public class HeroCard extends Card {
         }
         switch (intSuperSkill) {
             case 1: superSkill = TypeOfSuperSkillsHero.VAMPIRE;
-                    superSkillDescription = "Return " + procentOfVampirism + "% of \ninflicted damage.";
+                    superSkillDescription = "Return " + percentOfVampirism + "% of \ninflicted damage.";
                     typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_VAMPIRE.png");
-
+                    superSkillSound = Gdx.audio.newSound(Gdx.files.internal("sounds/vampireSound.mp3"));
                 break;
             case 2: superSkill = TypeOfSuperSkillsHero.BLOCKINGDAMAGE;
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_BLOCKINGDAMAGE.png");
-                superSkillDescription = "Have " + procentToBlockDamage + "% chance \nto block " + blockFactor + "%\nof taken damage.";
+                superSkillDescription = "Have " + percentToBlockDamage + "% chance \nto block " + blockFactor + "%\nof taken damage.";
+                superSkillSound = Gdx.audio.newSound(Gdx.files.internal("sounds/blockDamage.mp3"));
                 break;
             case 3: superSkill = TypeOfSuperSkillsHero.INCONSTANTOFSTATS;
                 superSkillDescription = "Change shape\nevery hit.";
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_INCONSTANTSTATS.png");
+                superSkillSound = Gdx.audio.newSound(Gdx.files.internal("sounds/inconstanSound.mp3"));
                 break;
             case 4: superSkill = TypeOfSuperSkillsHero.ADDDAMAGEBYLOWHEALTHPOINT;
                 superSkillDescription = "Health decreases,\ndamage increases.";
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_ADDDAMAGEBYLOWHP.png");
+                superSkillSound = Gdx.audio.newSound(Gdx.files.internal("sounds/blockDamage.mp3"));
                 break;
             case 5: superSkill = TypeOfSuperSkillsHero.CRITICALHIT;
                 typeOfHeroSkillTexture = new Texture("typeOfHeroSkill_pins/TypeOfHeroSkill_CRITICALHIT.png");
@@ -229,26 +237,28 @@ public class HeroCard extends Card {
 
 
     public void hit(HeroCard enemy){
+        typicalHitSound.play();
         enemy.effectTexture = new Texture("skillEffects/simpleAttack.png");
         if((int)(Math.random() * 100 + 1) > enemy.armor)
         switch (superSkill) {
             case VAMPIRE: {
-                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.procentToBlockDamage > Math.random() * 100 + 1)) {
+                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.percentToBlockDamage > Math.random() * 100 + 1)) {
                     enemy.healthPoints =(int) (enemy.healthPoints - this.damage + damage * (enemy.blockFactor / 10));
-                    this.healthPoints = this.healthPoints + this.damage * this.procentOfVampirism;
+                    this.healthPoints = this.healthPoints + this.damage * this.percentOfVampirism;
                     if (this.healthPoints > healthPool) healthPoints = healthPool;
                     enemy.effectTexture = new Texture("skillEffects/blockDmgEffect.png");
 
                 } else {
                     enemy.healthPoints = enemy.healthPoints - this.damage;
-                    this.healthPoints = this.healthPoints + this.damage * this.procentOfVampirism;
+                    this.healthPoints = this.healthPoints + this.damage * this.percentOfVampirism;
                     if (this.healthPoints > healthPool) healthPoints = healthPool;
                 }
+                 superSkillSound.play();
                  effectTexture = new Texture("skillEffects/vampireEffect.png");
                 break;
             }
             case BLOCKINGDAMAGE: {
-                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.procentToBlockDamage > Math.random() * 100 + 1)) {
+                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.percentToBlockDamage > Math.random() * 100 + 1)) {
                    enemy.healthPoints = (int) (enemy.healthPoints - this.damage + damage * (enemy.blockFactor / 10));
                     enemy.effectTexture = new Texture("skillEffects/blockDmgEffect.png");
                 } else {
@@ -257,17 +267,18 @@ public class HeroCard extends Card {
                 break;
             }
             case INCONSTANTOFSTATS: {
-                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.procentToBlockDamage > Math.random() * 100 + 1)) {
+                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.percentToBlockDamage > Math.random() * 100 + 1)) {
                     enemy.healthPoints =(int) (enemy.healthPoints - this.damage + damage * (enemy.blockFactor / 10));
                     enemy.effectTexture = new Texture("skillEffects/blockDmgEffect.png");
                 } else {
                     enemy.healthPoints = enemy.healthPoints - this.damage;
                 }
                 this.setStats();
+                superSkillSound.play();
                 break;
             }
             case ADDDAMAGEBYLOWHEALTHPOINT: {
-                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.procentToBlockDamage > Math.random() * 100 + 1)) {
+                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.percentToBlockDamage > Math.random() * 100 + 1)) {
                     if (healthPool / healthPoints * 100 < 30)
                         enemy.healthPoints =(int) (enemy.healthPoints - (this.damage * (healthPool / healthPoints + 1)) + this.damage * (enemy.blockFactor/10));
                     else
@@ -281,7 +292,7 @@ public class HeroCard extends Card {
                 break;
             }
             case CRITICALHIT: {
-                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.procentToBlockDamage > Math.random() * 100 + 1)) {
+                if ((enemy.superSkill == TypeOfSuperSkillsHero.BLOCKINGDAMAGE) && (enemy.percentToBlockDamage > Math.random() * 100 + 1)) {
                     enemy.effectTexture = new Texture("skillEffects/blockDmgEffect.png");
                     int chance = (int) (Math.random() * 100 + 1);
                     if (chance > criticalChance)
@@ -304,7 +315,7 @@ public class HeroCard extends Card {
             }
         }
         else  {
-            enemy.setSuperSkillSound(Gdx.audio.newSound(Gdx.files.internal("sounds/criticalHit.mp3")));
+            enemy.superSkillSound = Gdx.audio.newSound(Gdx.files.internal("sounds/blockDamage.mp3"));
             enemy.healthPoints -= damage;
             enemy.effectTexture = new Texture("skillEffects/skillAvoidEffect.png");
             enemy.superSkillSound.play();
@@ -317,6 +328,7 @@ public class HeroCard extends Card {
         enemy.velocityOfTransparency = 0;
         transparency = 0;
         velocityOfTransparency = 0;
+        typicalHitSound.play();
     }
 
     public void setTransparencyForEffects( float dt, float accelerationOfTransparency) {
@@ -331,58 +343,6 @@ public class HeroCard extends Card {
 
         } else transparency = 100;
     }
-
-  /*  public float setTransparency(float transparency, float dt, float accelerationOfTransparency){
-        if (transparency > 0) {
-            velocityOfTransparency = velocityOfTransparency + accelerationOfTransparency;
-            velocityOfTransparency = velocityOfTransparency * dt;
-            if (transparency + velocityOfTransparency > 0)
-                transparency = transparency + velocityOfTransparency;
-            else
-                transparency = 0;
-            velocityOfTransparency = velocityOfTransparency * (1 / dt);
-
-        } else transparency = 0;
-        return transparency;
-    }*/
-
-/*    public void hitThePlayer(Player enemy){
-        switch (intSuperSkill) {
-            case 1: {
-                enemy.healthPoints = enemy.healthPoints - this.damage + this.armor;
-                this.healthPoints = this.healthPoints + this.damage * this.procentOfVampirism;
-                if (this.healthPoints > healthPool) healthPoints = healthPool;
-                break;
-            }
-            case 3: {
-                enemy.healthPoints = enemy.healthPoints - this.damage;
-                this.setStats();
-                break;
-            }
-            case 4: {
-                if (healthPool / healthPoints * 100 < 30)
-                    enemy.healthPoints = enemy.healthPoints - (this.damage * (healthPool / healthPoints + 1));
-                else enemy.healthPoints = enemy.healthPoints - this.damage;
-                break;
-            }
-            case 5: {
-                int chance = (int) (Math.random() * 100 + 1);
-                if (chance > criticalChance)
-                    enemy.healthPoints = enemy.healthPoints - this.damage + this.armor;
-                else
-                    enemy.healthPoints = enemy.healthPoints - (this.damage * criticalFactor) + this.armor;
-                break;
-            }
-            case 2: {
-                enemy.healthPoints = enemy.healthPoints - this.damage + this.armor;
-                break;
-            }
-        }
-
-        this.haveUsed = true;
-        if (enemy.healthPoints <= 0) enemy.setStatusOfPlayer("Is Dead");
-
-    }*/
 
 
     public int getHealthPoints() {return healthPoints;}
@@ -409,9 +369,6 @@ public class HeroCard extends Card {
 
     public String getSuperSkillDescription() {return superSkillDescription;}
 
-    public Sound getSuperSkillSound() {return superSkillSound;}
-
-    public void setSuperSkillSound(Sound superSkillSound) {this.superSkillSound = superSkillSound;}
 
 
 

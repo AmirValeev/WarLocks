@@ -22,13 +22,12 @@ public class MyGame extends ApplicationAdapter {
 
 	@Override
 	public void create() {
-
+		Gdx.gl.glClearColor(1, 0, 0, 1);
 		ratioDeviceScreenToGameHeight =  Gdx.graphics.getHeight() / MyGame.HEIGHT;
 		ratioDeviceScreenToGameWight = (Gdx.graphics.getWidth() / MyGame.WIGHT);
 		batch = new SpriteBatchWithRatio();
 		shapeRenderer = new ShapeRenderer();
 		gsm = new GameStateManager();
-		Gdx.gl.glClearColor(1, 0, 0, 1);
 		gsm.push(new MenuState(gsm));
 
 

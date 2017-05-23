@@ -94,7 +94,7 @@ sb.draw(backgroundLoading, 0, 0);
         backgroundLoading.dispose();
         playBtn.dispose();
         fonMusic.dispose();
-
+        System.out.println("PlayState Disposed");
     }
 
     @Override
